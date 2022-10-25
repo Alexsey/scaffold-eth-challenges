@@ -71,17 +71,13 @@ export default function Dex(props) {
       <div>
         {rowForm("ethToToken", "💸", async value => {
           let valueInEther = ethers.utils.parseEther("" + value);
-          let valuePlusExtra = ethers.utils.parseEther("" + value * 1.03);
-          console.log("valuePlusExtra", valuePlusExtra);
-          let swapEthToTokenResult = await tx(writeContracts[contractName]["ethToToken"]({ value: valuePlusExtra }));
+          let swapEthToTokenResult = await tx(writeContracts[contractName]["ethToToken"]({ value: valueInEther }));
           console.log("swapEthToTokenResult:", swapEthToTokenResult);
         })}
 
         {rowForm("tokenToEth", "🔏", async value => {
           let valueInEther = ethers.utils.parseEther("" + value);
-          console.log("valueInEther", valueInEther);
-          let valuePlusExtra = ethers.utils.parseEther("" + value * 1.03);
-          console.log("valuePlusExtra", valuePlusExtra);
+          console.log("valuePlusExtra", valueInEther);
           let allowance = await props.readContracts[tokenName].allowance(
             props.address,
             props.readContracts[contractName].address,
@@ -89,15 +85,15 @@ export default function Dex(props) {
           console.log("allowance", allowance);
 
           let approveTx;
-          if (allowance.lt(valuePlusExtra)) {
+          if (allowance.lt(valueInEther)) {
             approveTx = await tx(
-              writeContracts[tokenName].approve(props.readContracts[contractName].address, valuePlusExtra, {
+              writeContracts[tokenName].approve(props.readContracts[contractName].address, valueInEther, {
                 gasLimit: 200000,
               }),
             );
           }
 
-          let swapTx = tx(writeContracts[contractName]["tokenToEth"](valuePlusExtra, { gasLimit: 200000 }));
+          let swapTx = tx(writeContracts[contractName]["tokenToEth"](valueInEther, { gasLimit: 200000 }));
           if (approveTx) {
             console.log("waiting on approve to finish...");
             let approveTxResult = await approveTx;

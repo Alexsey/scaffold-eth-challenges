@@ -60,9 +60,10 @@ const { ethers } = require("ethers");
 
 /// 📡 What chain are your contracts deployed to?
 const initialNetwork = NETWORKS.localhost; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
+// const initialNetwork = NETWORKS.goerli; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
 
 // 😬 Sorry for all the console logging
-const DEBUG = true;
+const DEBUG = false;
 const NETWORKCHECK = true;
 const USE_BURNER_WALLET = true; // toggle burner wallet feature
 const USE_NETWORK_SELECTOR = false;
@@ -164,9 +165,9 @@ function App(props) {
   const mainnetContracts = useContractLoader(mainnetProvider, contractConfig);
 
   // If you want to call a function on a new block
-  useOnBlock(mainnetProvider, () => {
-    console.log(`⛓ A new mainnet block is here: ${mainnetProvider._lastBlockNumber}`);
-  });
+  // useOnBlock(mainnetProvider, () => {
+  //   console.log(`⛓ A new mainnet block is here: ${mainnetProvider._lastBlockNumber}`);
+  // });
 
   // Then read your DAI balance like:
   const myMainnetDAIBalance = useContractReader(mainnetContracts, "DAI", "balanceOf", [
@@ -258,8 +259,8 @@ function App(props) {
 
   // ** TODO: The events are not showing up! Left most of it commented out, but can uncomment and play with! Pretty sure you need to go into DEX.jsx as that is where most of the UI Home-page is being derived from. 😵 📟 Listen for broadcast events
 
-  const EthToTokenSwapEvents = useEventListener(readContracts, "DEX", "EthToTokenSwap", localProvider, 1);
-  console.log("⟠ -->🎈 EthToTokenSwapEvents:", EthToTokenSwapEvents);
+  // const EthToTokenSwapEvents = useEventListener(readContracts, "DEX", "EthToTokenSwap", localProvider, 1);
+  // console.log("⟠ -->🎈 EthToTokenSwapEvents:", EthToTokenSwapEvents);
   // const TokenToEthSwapEvents = useEventListener(readContracts, "DEX", "TokenToEthSwap", 1);
   // // console.log("🎈-->⟠ TokenToEthSwapEvents:", TokenToEthSwapEvents);
   // const LiquidityProvidedEvents = useEventListener(readContracts, "DEX", "LiquidityProvided", 1);
@@ -371,6 +372,15 @@ function App(props) {
             contracts={readContracts}
             contractName="DEX"
             eventName="LiquidityRemoved"
+            localProvider={localProvider}
+            mainnetProvider={mainnetProvider}
+            startBlock={1}
+          />
+
+          <Events
+            contracts={readContracts}
+            contractName="Balloons"
+            eventName="Approved"
             localProvider={localProvider}
             mainnetProvider={mainnetProvider}
             startBlock={1}
